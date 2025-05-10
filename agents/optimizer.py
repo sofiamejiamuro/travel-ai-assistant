@@ -1,10 +1,16 @@
+from tools.weather import get_weather
+
 def optimizer_fn(state):
-    itinerary = state.get("itinerary", "")
-    
-    # Simulate optimization: e.g., removing stops with bad weather
-    optimized_itinerary = itinerary + " (optimized to avoid bad weather and reduce travel time)"
-    
+    itinerary_lines = state.get("itinerary", "").split("\\n")
+    optimized = []
+
+    for line in itinerary_lines:
+        stop = line.split(" - ")[0]
+        weather = get_weather(stop)
+        if "rain" not in weather.lower():
+            optimized.append(f"{line} (Weather: {weather})")
+
     return {
-        "optimized_itinerary": optimized_itinerary,
-        "optimizer_notes": "Adjusted for weather and efficiency"
+        "optimized_itinerary": "\\n".join(optimized),
+        "optimizer_notes": "Filtered out rainy stops"
     }

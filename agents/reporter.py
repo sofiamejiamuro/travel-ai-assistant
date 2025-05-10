@@ -1,8 +1,11 @@
+from tools.budget import estimate_trip_cost
+
 def reporter_fn(state):
-    optimized = state.get("optimized_itinerary", "")
-    
-    final_message = f"Here's your updated travel plan: {optimized}. Enjoy your trip!"
-    
+    itinerary = state.get("optimized_itinerary", "")
+    stops = itinerary.split("\\n")
+    cost = estimate_trip_cost(len(stops))
+    itinerary = itinerary.replace("\\n", "\n")
+
     return {
-        "final_message": final_message
+        "final_message": f"Here’s your plan:\n{itinerary}\n\nEstimated trip cost: {cost}"
     }
