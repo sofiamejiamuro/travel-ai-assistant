@@ -1,20 +1,16 @@
 from dotenv import load_dotenv
-from typing import Annotated, Literal
-from langgraph.graph import StateGraph, START, END
-from langgraph.graph.message import add_messages
-from langchain.chat_models import init_chat_model
-from pydantic import BaseModel, Field
+from langgraph.graph import StateGraph, END
 from typing_extensions import TypedDict
 from agents.planner import planner_fn
 from agents.optimizer import optimizer_fn
 from agents.reporter import reporter_fn
+from tools.llm_factory import init_llm_with_prompt
 
 load_dotenv()
 
 # Initialize the LLM
-llm = init_chat_model(
-    "openai:gpt-4"
-)
+travel_mode = input("What kind of trip do you want? (scenic / fastest / weather): ")
+llm = init_llm_with_prompt(travel_mode.strip().lower())
 
 # Step 1: Define State
 class TravelState(TypedDict):
@@ -31,9 +27,10 @@ class TravelState(TypedDict):
 graph_builder = StateGraph(TravelState)
 
 # Step 3: Add nodes (agent functions)
-graph_builder.add_node("planner", planner_fn)
+graph_builder.add_node("planner", lambda state: planner_fn(state, llm=llm))
 graph_builder.add_node("optimizer", optimizer_fn)
-graph_builder.add_node("reporter", reporter_fn)
+graph_builder.add_node("reporter", lambda state: reporter_fn(state, llm))
+
 
 # Step 4: Define edges (agent collaboration)
 graph_builder.set_entry_point("planner")
