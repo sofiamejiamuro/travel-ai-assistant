@@ -155,7 +155,7 @@ This script will fetch weather data for a predefined list of cities to ensure th
 
 * **Real API Integration**: Replace mock POI and route data with real-time data from services like Google Places and Mapbox.
 * **Enhanced Evaluation**: Incorporate LLM-based evaluation for more nuanced assessment of itinerary quality.
-
+* **Unit Testing**: Add test coverage
 ---
 
 🙌 Notes
