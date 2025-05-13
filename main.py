@@ -5,6 +5,7 @@ from agents.planner import planner_fn
 from agents.optimizer import optimizer_fn
 from agents.reporter import reporter_fn
 from tools.llm_factory import init_llm_with_prompt
+from evaluate import evaluate_itinerary
 
 load_dotenv()
 
@@ -63,3 +64,17 @@ output = graph.invoke(initial_state)
 # Step 8: Show final result
 print("\n🧳 Final Travel Plan:")
 print(output["final_message"])
+
+# Step 9: Response Heuristic evaluation
+print("\n🧪 Evaluation of the Travel Plan:")
+evaluation_result = evaluate_itinerary(
+    origin=origin,
+    destination=destination,
+    preferences=preferences,
+    itinerary_text=output["final_message"]
+)
+
+for detail in evaluation_result["details"]:
+    print(detail)
+
+print(f"\n🧠 Evaluation Score: {evaluation_result['score']} / {evaluation_result['max_score']}")

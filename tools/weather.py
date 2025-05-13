@@ -8,13 +8,15 @@ load_dotenv()
 API_KEY = os.getenv("OPENWEATHERMAP_API_KEY")
 print(f"Loaded API KEY: {API_KEY}")
 
+
 def get_weather(location, country_code="mx"):
     if not API_KEY:
         return "Weather data unavailable (missing API key)"
 
     # Normalize and encode location
     clean_location = unidecode.unidecode(location.strip().title())
-    encoded_location = quote(f"{clean_location},{country_code}")
+    #encoded_location = quote(f"{clean_location},{country_code}")
+    encoded_location = quote(clean_location)
     url = f"https://api.openweathermap.org/data/2.5/weather?q={encoded_location}&appid={API_KEY}&units=metric"
 
     print(f"Fetching weather for: {clean_location}")
