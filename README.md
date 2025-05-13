@@ -1,10 +1,10 @@
-# 🧭 Travel AI Assistant
+# Travel AI Assistant
 
 A modular, agent-powered travel planner built with LangGraph and LangChain, integrating real-time APIs (OpenWeatherMap) and prompt engineering strategies to deliver personalized trip plans.
 
 ---
 
-## 🌍 Overview
+## 🧭 Overview
 
 This project simulates a next-generation AI-assisted travel guide. It enables tourists to dynamically plan and adjust their itineraries based on preferences like weather, budget, route type, and cultural points of interest. Built as part of a technical assessment, the solution focuses on:
 
@@ -12,115 +12,118 @@ This project simulates a next-generation AI-assisted travel guide. It enables to
 * ✅ Prompt engineering strategies
 * ✅ Real-time API integration
 * ✅ Modular, testable code
+* ✅ Heuristic-based evaluation
 
 ---
 
-## 🧠 Architecture
+## 🧱 Architecture
 
-### 🧩 Agent Design (LangGraph MCP-style)
+### 🧠 Agent Design (LangGraph MCP-style)
 
-* **Planner Agent**: builds an initial itinerary based on the user's origin, destination, and preferences.
-* **Optimizer Agent**: adjusts the itinerary considering constraints such as cost, weather, or duration.
-* **Reporter Agent**: generates a friendly final summary in natural language using an LLM.
+* **Planner Agent**: Builds an initial itinerary based on user input and selected prompt mode (e.g., scenic, fastest, weather-aware).
+* **Optimizer Agent**: Refines the route by applying constraints like weather, POIs, or user preferences.
+* **Reporter Agent**: Generates a conversational summary of the final plan.
 
-All agents are orchestrated using LangGraph's `StateGraph`, enabling clear state propagation and flow control.
+Agents communicate via a shared state graph, allowing for flexible transitions and easy debugging.
 
----
+### 🧰 Tools & Mock APIs
 
-## 📝 Prompt Strategy
+* `tools/weather.py`: Fetches weather data using OpenWeatherMap API.
+* `tools/pois.py`: Simulates POI lookup per city.
+* `tools/routes.py`: Generates mock routes between cities.
+* `tools/search.py`: Placeholder for future search integration.
 
-System prompts play a crucial role in shaping agent behavior. This project includes three prompt variants tailored to common travel goals:
+### 📜 Prompt Design
 
-### 1. `scenic.txt`
+System prompts are stored in `/prompts/` and include:
 
-**Tone**: Descriptive, enriching
-**Goal**: Maximize cultural, natural, and historical exposure
-**Use case**: Ideal for users who want slow, inspiring travel experiences
+* `scenic.txt`
+* `fastest.txt`
+* `weather.txt`
 
-> "You are a thoughtful travel planner focused on crafting scenic journeys. Include stops at natural landscapes, historic towns, and cultural landmarks. Avoid highways and prioritize memorable routes."
+Each prompt adjusts the assistant's tone and planning strategy.
 
-### 2. `fastest.txt`
-
-**Tone**: Direct, pragmatic
-**Goal**: Optimize travel speed and efficiency
-**Use case**: Ideal for business travelers or users on tight schedules
-
-> "You are a highly efficient travel planner. Your goal is to minimize travel time while ensuring essential details like directions and weather are accurate. Focus on highways and direct routes."
-
-### 3. `weather.txt`
-
-**Tone**: Balanced, cautious
-**Goal**: Maximize safety and comfort by avoiding bad weather
-**Use case**: Ideal for family travel or travel during volatile seasons
-
-> "You are a travel planner that optimizes routes for weather safety. Suggest routes that avoid rain, storms, or extreme temperatures. Prioritize stops with good weather over scenic appeal."
-
-### 🧠 Rationale
+###  🧠 Rationale
 
 These prompts vary across three dimensions:
 
-* **Tone** (warm vs. efficient)
-* **Goal** (scenic vs. fast vs. safe)
-* **Constraints** (avoid bad weather, prioritize comfort or cultural depth)
+* Tone (warm vs. efficient)
+* Goal (scenic vs. fast vs. safe)
+* Constraints (avoid bad weather, prioritize comfort or cultural depth)
 
 This allows us to:
 
-* Test **response quality and tone adaptability**
-* Evaluate how well different prompts satisfy **user intent**
-* Support future **multi-turn adaptation**
+* Test response quality and tone adaptability
+* Evaluate how well different prompts satisfy user intent
+* Support future multi-turn adaptation
 
 Prompt loading is dynamic based on the user's trip type (selected via input).
 
 ---
 
-## 🔌 API Integrations
+## ✅ Evaluation Logic
 
-* **OpenWeatherMap API**: for real-time weather summaries at each stop.
-* **Mocked POI and Routing APIs**: simulate cultural sites and path generation with location-specific logic (Europe vs Mexico).
+Implemented in `evaluate.py`, the assistant's output is scored across four criteria:
 
----
+1. **Route Feasibility**: Ensures the itinerary includes more than one stop.
+2. **POI Inclusion**: Checks for the presence of points of interest in the itinerary.
+3. **Weather Availability**: Verifies that weather data is available for all stops.
+4. **Preference Satisfaction**: Assesses whether the itinerary reflects user preferences.
 
-## 🧪 Evaluation Logic *(in progress)*
-
-A modular script will:
-
-1. Run the graph with each prompt.
-2. Score based on:
-
-   * Itinerary structure (start, stops, destination)
-   * Constraint match (weather, cost, duration)
-   * LLM-based critique on tone & helpfulness
-
----
-
-## ✅ Testing Plan *(in progress)*
-
-* Unit tests for each agent (`planner`, `optimizer`, `reporter`)
-* Mocked API test cases
-* Prompt-based behavior comparison tests
+Each criterion adds one point to the total score, with a maximum of 4. Detailed feedback is appended to the final report.
 
 ---
 
 ## 🚀 Run the App
 
+### 1. Clone the Repository
+
 ```bash
-# Set up environment
-python3 -m venv .venv
-source .venv/bin/activate
+git clone https://github.com/sofiamejiamuro/travel-ai-assistant.git
+cd travel-ai-assistant
+```
+
+### 2. Install Dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-# Add your .env with:
-OPENAI_API_KEY=your_key_here
-OPENWEATHERMAP_API_KEY=your_key_here
-SERPAPI_API_KE=your_key_here
+### 3. Set Up Environment Variables
 
-# Run the app
+Create a `.env` file in the root directory and add your OpenWeatherMap API key:
+
+```bash
+OPENAI_API_KEY=your_api_key_here
+OPENWEATHER_API_KEY=your_api_key_here
+SERPAPI_API_KEY=your_api_key_here
+```
+
+### 4. Run the Assistant
+
+```bash
 python main.py
 ```
 
+Follow the prompts to input your travel preferences and receive a personalized itinerary.
+
 ---
 
-## 📁 Folder Structure
+## 🧪 Testing
+
+### Weather Function Test
+
+To test the weather function independently:
+
+```bash
+python weather_test.py
+```
+
+This script will fetch weather data for a predefined list of cities to ensure the API integration works correctly.
+
+---
+
+## 📂 Project Structure
 
 ```
 ├── agents/
@@ -128,33 +131,35 @@ python main.py
 │   ├── planner.py
 │   └── reporter.py
 ├── prompts/
-│   ├── fastest.txt
+│   ├── fastest.txt 
 │   ├── scenic.txt
 │   └── weather.txt
 ├── tools/
-│   ├── budget.py
-│   ├── llm_factory.py
+│   ├── pois.py 
+|   ├── llm_factory.py
 │   ├── pois.py
 │   ├── routes.py
 │   ├── search.py
-│   └── weather.py
+|   └── weather.py
+├── evaluate.py
+├── evaluate_cases.py
 ├── main.py
+├── weather_test.py
+├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## ✨ Next Steps
+## 📝 Future
 
-* [ ] Add evaluation runner script
-* [ ] Finalize test coverage
-* [ ] Expand to support cultural preferences
-* [ ] Optional: Add Streamlit UI for demo
+* **Real API Integration**: Replace mock POI and route data with real-time data from services like Google Places and Mapbox.
+* **Enhanced Evaluation**: Incorporate LLM-based evaluation for more nuanced assessment of itinerary quality.
 
 ---
 
-## 🙌 Notes
+🙌 Notes
 
 This was completed under a strict time constraint. The solution reflects scalable thinking, modular structure, and production-oriented architecture despite being a prototype.
 
-> Built with ❤️ by Sof
+> Built with ❤️ and lots of ☕ by Sof
